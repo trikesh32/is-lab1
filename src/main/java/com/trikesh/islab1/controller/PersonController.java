@@ -27,7 +27,6 @@ public class PersonController {
     @Autowired
     private PersonService personService;
 
-    // Получить всех persons с пагинацией
     @GetMapping
     public ResponseEntity<Page<PersonDTO>> getAllPersons(
             @RequestParam(defaultValue = "0") int page,
@@ -41,7 +40,6 @@ public class PersonController {
         return ResponseEntity.ok(personDTOs);
     }
 
-    // Получить person по ID
     @GetMapping("/{id}")
     public ResponseEntity<PersonDTO> getPersonById(@PathVariable Long id) {
         Optional<Person> person = personService.findById(id);
@@ -49,14 +47,12 @@ public class PersonController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // Создать нового person
     @PostMapping
     public ResponseEntity<PersonDTO> createPerson(@Valid @RequestBody Person person) {
         Person savedPerson = personService.save(person);
         return ResponseEntity.status(HttpStatus.CREATED).body(new PersonDTO(savedPerson));
     }
 
-    // Обновить существующего person
     @PutMapping("/{id}")
     public ResponseEntity<PersonDTO> updatePerson(
             @PathVariable Long id,
@@ -71,7 +67,6 @@ public class PersonController {
         return ResponseEntity.ok(new PersonDTO(updatedPerson));
     }
 
-    // Удалить person
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletePerson(@PathVariable Long id) {
         if (!personService.existsById(id)) {
@@ -82,7 +77,6 @@ public class PersonController {
         return ResponseEntity.noContent().build();
     }
 
-    // Поиск по имени (фильтрация)
     @GetMapping("/search")
     public ResponseEntity<Page<PersonDTO>> searchPersons(
             @RequestParam String name,
@@ -95,8 +89,6 @@ public class PersonController {
 
         return ResponseEntity.ok(personDTOs);
     }
-
-    // Специальные операции
 
     @GetMapping("/operations/total-height")
     public ResponseEntity<Long> getTotalHeight() {

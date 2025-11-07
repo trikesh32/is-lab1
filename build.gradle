@@ -38,3 +38,11 @@ dependencies {
 tasks.named('test') {
     useJUnitPlatform()
 }
+
+jar {
+    manifest {
+        attributes(
+                'Main-Class': 'com.trikesh.islab1.IsLab1Application'
+        )
+    }
+}
