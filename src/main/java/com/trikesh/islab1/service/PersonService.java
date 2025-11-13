@@ -55,6 +55,13 @@ public class PersonService {
     }
     
     private void validateUniqueConstraints(Person person) {
+        validateNameCoordinatesBirthday(person);
+        validateLocationForSamePhysicalParams(person);
+        validateAppearanceNationalityInLocation(person);
+        validateNameProximity(person);
+    }
+    
+    private void validateNameCoordinatesBirthday(Person person) {
         List<Person> existingPersons = personRepository.findByNameContainingIgnoreCase(person.getName(), null).getContent();
         for (Person existing : existingPersons) {
             if (existing.getName().equals(person.getName()) &&
@@ -65,6 +72,78 @@ public class PersonService {
                     "Person with same name, coordinates and birthday already exists"
                 );
             }
+        }
+    }
+    
+    private void validateLocationForSamePhysicalParams(Person person) {
+        if (person.getHeight() == null) return;
+        
+        List<Person> allPersons = personRepository.findAll();
+        for (Person existing : allPersons) {
+            if (existing.getId() != null && existing.getId().equals(person.getId())) continue;
+            
+            if (existing.getHeight() != null &&
+                existing.getHeight().equals(person.getHeight()) &&
+                existing.getWeight().equals(person.getWeight()) &&
+                existing.getLocation().getX().equals(person.getLocation().getX()) &&
+                existing.getLocation().getY().equals(person.getLocation().getY()) &&
+                existing.getLocation().getName().equals(person.getLocation().getName())) {
+                throw new IllegalArgumentException(
+                    "Person with same height (" + person.getHeight() +
+                    "), weight (" + person.getWeight() +
+                    ") and location already exists. Two people with identical physical parameters cannot be in the same location"
+                );
+            }
+        }
+    }
+    
+    private void validateAppearanceNationalityInLocation(Person person) {
+        List<Person> allPersons = personRepository.findAll();
+        for (Person existing : allPersons) {
+            if (existing.getId() != null && existing.getId().equals(person.getId())) continue;
+            
+            if (existing.getEyeColor() == person.getEyeColor() &&
+                existing.getHairColor() == person.getHairColor() &&
+                existing.getNationality() == person.getNationality() &&
+                existing.getLocation().getX().equals(person.getLocation().getX()) &&
+                existing.getLocation().getY().equals(person.getLocation().getY()) &&
+                existing.getLocation().getName().equals(person.getLocation().getName())) {
+                throw new IllegalArgumentException(
+                    "Person with same eye color (" + person.getEyeColor() +
+                    "), hair color (" + person.getHairColor() +
+                    "), nationality (" + person.getNationality() +
+                    ") already exists in location '" + person.getLocation().getName() +
+                    "'. This combination must be unique per location"
+                );
+            }
+        }
+    }
+    
+    private void validateNameProximity(Person person) {
+        List<Person> sameNamePersons = personRepository.findByNameContainingIgnoreCase(person.getName(), null).getContent()
+            .stream()
+            .filter(p -> p.getName().equals(person.getName()))
+            .filter(p -> p.getId() == null || !p.getId().equals(person.getId()))
+            .toList();
+        
+        if (sameNamePersons.isEmpty()) return;
+        
+        final double RADIUS = 100.0;
+        long nearbyCount = sameNamePersons.stream()
+            .filter(existing -> {
+                double distance = Math.sqrt(
+                    Math.pow(existing.getCoordinates().getX() - person.getCoordinates().getX(), 2) +
+                    Math.pow(existing.getCoordinates().getY() - person.getCoordinates().getY(), 2)
+                );
+                return distance <= RADIUS;
+            })
+            .count();
+        
+        if (nearbyCount >= 3) {
+            throw new IllegalArgumentException(
+                "Too many people with name '" + person.getName() +
+                "' in proximity (radius " + RADIUS + " units). Maximum 3 people with same name allowed in this area"
+            );
         }
     }
 

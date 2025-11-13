@@ -35,12 +35,19 @@ public class ImportService {
     private PersonWebSocketController webSocketController;
 
     private void validateUniqueConstraints(Person person, Set<String> importedKeys) {
+        validateNameCoordinatesBirthday(person, importedKeys);
+        validateLocationForSamePhysicalParams(person);
+        validateAppearanceNationalityInLocation(person);
+        validateNameProximity(person);
+    }
+    
+    private void validateNameCoordinatesBirthday(Person person, Set<String> importedKeys) {
         String uniqueKey = generateUniqueKey(person);
         
         if (importedKeys.contains(uniqueKey)) {
             throw new IllegalArgumentException(
-                "Duplicate person in import file: " + person.getName() + 
-                " with coordinates (" + person.getCoordinates().getX() + ", " + 
+                "Duplicate person in import file: " + person.getName() +
+                " with coordinates (" + person.getCoordinates().getX() + ", " +
                 person.getCoordinates().getY() + ")"
             );
         }
@@ -49,13 +56,80 @@ public class ImportService {
         for (Person existing : existingPersons) {
             if (generateUniqueKey(existing).equals(uniqueKey)) {
                 throw new IllegalArgumentException(
-                    "Person already exists in database: " + person.getName() + 
+                    "Person already exists in database: " + person.getName() +
                     " with same coordinates and birthday"
                 );
             }
         }
         
         importedKeys.add(uniqueKey);
+    }
+    
+    private void validateLocationForSamePhysicalParams(Person person) {
+        if (person.getHeight() == null) return;
+        
+        List<Person> allPersons = personRepository.findAll();
+        for (Person existing : allPersons) {
+            if (existing.getHeight() != null &&
+                existing.getHeight().equals(person.getHeight()) &&
+                existing.getWeight().equals(person.getWeight()) &&
+                existing.getLocation().getX().equals(person.getLocation().getX()) &&
+                existing.getLocation().getY().equals(person.getLocation().getY()) &&
+                existing.getLocation().getName().equals(person.getLocation().getName())) {
+                throw new IllegalArgumentException(
+                    "Person with same height (" + person.getHeight() +
+                    "), weight (" + person.getWeight() +
+                    ") and location already exists. Two people with identical physical parameters cannot be in the same location"
+                );
+            }
+        }
+    }
+    
+    private void validateAppearanceNationalityInLocation(Person person) {
+        List<Person> allPersons = personRepository.findAll();
+        for (Person existing : allPersons) {
+            if (existing.getEyeColor() == person.getEyeColor() &&
+                existing.getHairColor() == person.getHairColor() &&
+                existing.getNationality() == person.getNationality() &&
+                existing.getLocation().getX().equals(person.getLocation().getX()) &&
+                existing.getLocation().getY().equals(person.getLocation().getY()) &&
+                existing.getLocation().getName().equals(person.getLocation().getName())) {
+                throw new IllegalArgumentException(
+                    "Person with same eye color (" + person.getEyeColor() +
+                    "), hair color (" + person.getHairColor() +
+                    "), nationality (" + person.getNationality() +
+                    ") already exists in location '" + person.getLocation().getName() +
+                    "'. This combination must be unique per location"
+                );
+            }
+        }
+    }
+    
+    private void validateNameProximity(Person person) {
+        List<Person> sameNamePersons = personRepository.findByNameContainingIgnoreCase(person.getName(), null).getContent()
+            .stream()
+            .filter(p -> p.getName().equals(person.getName()))
+            .toList();
+        
+        if (sameNamePersons.isEmpty()) return;
+        
+        final double RADIUS = 100.0;
+        long nearbyCount = sameNamePersons.stream()
+            .filter(existing -> {
+                double distance = Math.sqrt(
+                    Math.pow(existing.getCoordinates().getX() - person.getCoordinates().getX(), 2) +
+                    Math.pow(existing.getCoordinates().getY() - person.getCoordinates().getY(), 2)
+                );
+                return distance <= RADIUS;
+            })
+            .count();
+        
+        if (nearbyCount >= 3) {
+            throw new IllegalArgumentException(
+                "Too many people with name '" + person.getName() +
+                "' in proximity (radius " + RADIUS + " units). Maximum 3 people with same name allowed in this area"
+            );
+        }
     }
 
     private String generateUniqueKey(Person person) {
