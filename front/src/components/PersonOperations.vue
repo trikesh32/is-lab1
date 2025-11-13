@@ -1,36 +1,36 @@
 <template>
   <div class="operations-panel">
-    <h3>Special Operations</h3>
+    <h3>Специальные операции</h3>
 
     <div class="operations-grid">
       <div class="operation-card">
-        <h4>Total Height</h4>
+        <h4>Общий рост</h4>
         <button class="btn btn-info" @click="$emit('calculate-total-height')">
-          Calculate
+          Вычислить
         </button>
       </div>
 
       <div class="operation-card">
-        <h4>Count by Weight</h4>
+        <h4>Подсчет по весу</h4>
         <div class="operation-input">
           <input
               v-model.number="weightFilter"
               type="number"
               min="1"
-              placeholder="Enter weight"
+              placeholder="Введите вес"
           >
           <button
               class="btn btn-info"
               @click="$emit('count-by-weight', weightFilter)"
               :disabled="!weightFilter"
           >
-            Count
+            Подсчитать
           </button>
         </div>
       </div>
 
       <div class="operation-card">
-        <h4>Find by Birthday</h4>
+        <h4>Поиск по дню рождения</h4>
         <div class="operation-input">
           <input
               v-model="birthdayFilter"
@@ -41,16 +41,16 @@
               @click="$emit('find-by-birthday', birthdayFilter)"
               :disabled="!birthdayFilter"
           >
-            Find
+            Найти
           </button>
         </div>
       </div>
 
       <div class="operation-card">
-        <h4>Hair Color Percentage</h4>
+        <h4>Процент цвета волос</h4>
         <div class="operation-input">
           <select v-model="selectedHairColor">
-            <option value="">Select color</option>
+            <option value="">Выберите цвет</option>
             <option v-for="color in colors" :key="'hair-op-' + color" :value="color">
               {{ color }}
             </option>
@@ -60,16 +60,16 @@
               @click="$emit('hair-color-percentage', selectedHairColor)"
               :disabled="!selectedHairColor"
           >
-            Calculate
+            Вычислить
           </button>
         </div>
       </div>
 
       <div class="operation-card">
-        <h4>Eye Color Percentage</h4>
+        <h4>Процент цвета глаз</h4>
         <div class="operation-input">
           <select v-model="selectedEyeColor">
-            <option value="">Select color</option>
+            <option value="">Выберите цвет</option>
             <option v-for="color in colors" :key="'eye-op-' + color" :value="color">
               {{ color }}
             </option>
@@ -79,7 +79,7 @@
               @click="$emit('eye-color-percentage', selectedEyeColor)"
               :disabled="!selectedEyeColor"
           >
-            Calculate
+            Вычислить
           </button>
         </div>
       </div>

@@ -41,7 +41,6 @@ public class PersonService {
     public Person save(Person person) {
         boolean isNew = person.getId() == null;
         
-        // Проверка уникальности: имя + координаты + дата рождения
         if (isNew) {
             validateUniqueConstraints(person);
         }
@@ -82,7 +81,6 @@ public class PersonService {
         return personRepository.existsById(id);
     }
 
-    // Специальные операции
     public Long calculateTotalHeight() {
         Long sum = personRepository.sumHeight();
         return sum != null ? sum : 0L;

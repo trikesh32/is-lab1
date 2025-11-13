@@ -34,12 +34,9 @@ public class ImportService {
     @Autowired
     private PersonWebSocketController webSocketController;
 
-    // Уникальные ограничения на уровне бизнес-логики
-    // Проверяем уникальность комбинации: имя + координаты + дата рождения
     private void validateUniqueConstraints(Person person, Set<String> importedKeys) {
         String uniqueKey = generateUniqueKey(person);
         
-        // Проверяем в текущем импорте
         if (importedKeys.contains(uniqueKey)) {
             throw new IllegalArgumentException(
                 "Duplicate person in import file: " + person.getName() + 
@@ -48,7 +45,6 @@ public class ImportService {
             );
         }
         
-        // Проверяем в БД
         List<Person> existingPersons = personRepository.findByNameContainingIgnoreCase(person.getName(), null).getContent();
         for (Person existing : existingPersons) {
             if (generateUniqueKey(existing).equals(uniqueKey)) {
@@ -81,16 +77,13 @@ public class ImportService {
                 throw new IllegalArgumentException("No valid persons found in file");
             }
 
-            // Сохраняем всех людей
             List<Person> savedPersons = personRepository.saveAll(persons);
-            
-            // Обновляем историю
+
             history.setStatus(ImportStatus.SUCCESS);
             history.setObjectsCount(savedPersons.size());
             history.setCompletedAt(LocalDateTime.now());
             importHistoryRepository.save(history);
 
-            // Отправляем уведомления через WebSocket
             for (Person person : savedPersons) {
                 webSocketController.notifyPersonCreated(person);
             }
@@ -116,7 +109,6 @@ public class ImportService {
             String line;
             int lineNumber = 0;
             
-            // Пропускаем заголовок
             reader.readLine();
             lineNumber++;
 
@@ -146,39 +138,31 @@ public class ImportService {
 
         Person person = new Person();
         
-        // Основные поля
         person.setName(fields[0].trim());
-        
-        // Координаты
+
         Coordinates coordinates = new Coordinates();
         coordinates.setX(Double.parseDouble(fields[1].trim()));
         coordinates.setY(Float.parseFloat(fields[2].trim()));
         person.setCoordinates(coordinates);
         
-        // Цвета
         person.setEyeColor(Color.valueOf(fields[3].trim().toUpperCase()));
         person.setHairColor(Color.valueOf(fields[4].trim().toUpperCase()));
         
-        // Локация
         Location location = new Location();
         location.setX(Float.parseFloat(fields[5].trim()));
         location.setY(Integer.parseInt(fields[6].trim()));
         location.setName(fields[7].trim());
         person.setLocation(location);
         
-        // Рост
         String heightStr = fields[8].trim();
         if (!heightStr.isEmpty()) {
             person.setHeight(Long.parseLong(heightStr));
         }
         
-        // День рождения
         person.setBirthday(ZonedDateTime.parse(fields[9].trim(), DateTimeFormatter.ISO_ZONED_DATE_TIME));
-        
-        // Вес
+
         person.setWeight(Integer.parseInt(fields[10].trim()));
-        
-        // Национальность
+
         person.setNationality(Country.valueOf(fields[11].trim().toUpperCase()));
 
         return person;

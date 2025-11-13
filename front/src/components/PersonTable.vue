@@ -1,13 +1,13 @@
 <template>
   <div class="person-table">
     <div class="table-header">
-      <h2>Persons</h2>
+      <h2>Люди</h2>
       <div class="table-actions">
         <button class="btn btn-primary" @click="$emit('add-person')">
-          Add Person
+          Добавить
         </button>
         <button class="btn btn-secondary" @click="$emit('refresh')">
-          Refresh
+          Обновить
         </button>
       </div>
     </div>
@@ -17,13 +17,13 @@
         <thead>
         <tr>
           <th>ID</th>
-          <th>Name</th>
-          <th>Eye Color</th>
-          <th>Hair Color</th>
-          <th>Height</th>
-          <th>Weight</th>
-          <th>Nationality</th>
-          <th>Actions</th>
+          <th>Имя</th>
+          <th>Цвет глаз</th>
+          <th>Цвет волос</th>
+          <th>Рост</th>
+          <th>Вес</th>
+          <th>Национальность</th>
+          <th>Действия</th>
         </tr>
         </thead>
         <tbody>
@@ -37,15 +37,15 @@
           <td>{{ person.nationality }}</td>
           <td class="actions">
             <button class="btn btn-sm btn-primary" @click="$emit('edit-person', person)">
-              Edit
+              Изменить
             </button>
             <button class="btn btn-sm btn-danger" @click="$emit('delete-person', person)">
-              Delete
+              Удалить
             </button>
           </td>
         </tr>
         <tr v-if="persons.length === 0">
-          <td colspan="8" class="no-data">No persons found</td>
+          <td colspan="8" class="no-data">Люди не найдены</td>
         </tr>
         </tbody>
       </table>
@@ -57,12 +57,12 @@
           :disabled="pagination.page === 0"
           @click="$emit('page-change', pagination.page - 1)"
       >
-        Previous
+        Назад
       </button>
 
       <span class="page-info">
-        Page {{ pagination.page + 1 }} of {{ pagination.totalPages }}
-        (Total: {{ pagination.totalElements }})
+        Страница {{ pagination.page + 1 }} из {{ pagination.totalPages }}
+        (Всего: {{ pagination.totalElements }})
       </span>
 
       <button
@@ -70,7 +70,7 @@
           :disabled="pagination.page === pagination.totalPages - 1"
           @click="$emit('page-change', pagination.page + 1)"
       >
-        Next
+        Вперед
       </button>
     </div>
   </div>

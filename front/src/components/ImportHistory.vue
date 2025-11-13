@@ -1,14 +1,14 @@
 <template>
   <div class="import-history">
     <div class="history-card">
-      <h2>📋 Import History</h2>
+      <h2>История импорта</h2>
 
       <div v-if="loading" class="loading">
-        Loading history...
+        Загрузка истории...
       </div>
 
       <div v-else-if="history.length === 0" class="no-data">
-        No import history found
+        История импорта не найдена
       </div>
 
       <div v-else class="history-table-wrapper">
@@ -16,13 +16,13 @@
           <thead>
             <tr>
               <th>ID</th>
-              <th>User</th>
-              <th>File Name</th>
-              <th>Status</th>
-              <th>Objects Count</th>
-              <th>Created At</th>
-              <th>Completed At</th>
-              <th>Error</th>
+              <th>Пользователь</th>
+              <th>Имя файла</th>
+              <th>Статус</th>
+              <th>Количество объектов</th>
+              <th>Создано</th>
+              <th>Завершено</th>
+              <th>Ошибка</th>
             </tr>
           </thead>
           <tbody>
@@ -55,17 +55,17 @@
           :disabled="pagination.page === 0"
           class="btn btn-secondary"
         >
-          Previous
+          Назад
         </button>
         <span class="page-info">
-          Page {{ pagination.page + 1 }} of {{ pagination.totalPages }}
+          Страница {{ pagination.page + 1 }} из {{ pagination.totalPages }}
         </span>
-        <button 
-          @click="changePage(pagination.page + 1)" 
+        <button
+          @click="changePage(pagination.page + 1)"
           :disabled="pagination.page >= pagination.totalPages - 1"
           class="btn btn-secondary"
         >
-          Next
+          Вперед
         </button>
       </div>
     </div>
@@ -98,7 +98,6 @@ export default {
       try {
         const url = `http://localhost:8080/api/import/history?page=${page}&size=${this.pagination.size}`
         
-        // Получаем токен из localStorage
         const token = localStorage.getItem('token')
 
         const response = await axios.get(url, {
@@ -116,7 +115,7 @@ export default {
         }
       } catch (error) {
         console.error('Error loading import history:', error)
-        this.$emit('error', 'Failed to load import history')
+        this.$emit('error', 'Не удалось загрузить историю импорта')
       } finally {
         this.loading = false
       }

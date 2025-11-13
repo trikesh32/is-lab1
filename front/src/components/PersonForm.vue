@@ -2,27 +2,27 @@
   <div class="modal-overlay" @click.self="$emit('cancel')">
     <div class="modal-content">
       <div class="modal-header">
-        <h3>{{ editingPerson ? 'Edit Person' : 'Add New Person' }}</h3>
+        <h3>{{ editingPerson ? 'Редактировать человека' : 'Добавить нового человека' }}</h3>
         <button class="close-btn" @click="$emit('cancel')">&times;</button>
       </div>
 
       <form @submit.prevent="handleSubmit" class="person-form">
         <div class="form-group">
-          <label for="name">Name *</label>
+          <label for="name">Имя *</label>
           <input
               id="name"
               v-model="form.name"
               type="text"
               required
-              placeholder="Enter name"
+              placeholder="Введите имя"
           >
         </div>
 
         <div class="form-row">
           <div class="form-group">
-            <label for="eyeColor">Eye Color *</label>
+            <label for="eyeColor">Цвет глаз *</label>
             <select id="eyeColor" v-model="form.eyeColor" required>
-              <option value="">Select eye color</option>
+              <option value="">Выберите цвет глаз</option>
               <option v-for="color in colors" :key="'eye-' + color" :value="color">
                 {{ color }}
               </option>
@@ -30,9 +30,9 @@
           </div>
 
           <div class="form-group">
-            <label for="hairColor">Hair Color *</label>
+            <label for="hairColor">Цвет волос *</label>
             <select id="hairColor" v-model="form.hairColor" required>
-              <option value="">Select hair color</option>
+              <option value="">Выберите цвет волос</option>
               <option v-for="color in colors" :key="'hair-' + color" :value="color">
                 {{ color }}
               </option>
@@ -42,33 +42,33 @@
 
         <div class="form-row">
           <div class="form-group">
-            <label for="height">Height</label>
+            <label for="height">Рост</label>
             <input
                 id="height"
                 v-model.number="form.height"
                 type="number"
                 min="1"
-                placeholder="Enter height"
+                placeholder="Введите рост"
             >
           </div>
 
           <div class="form-group">
-            <label for="weight">Weight *</label>
+            <label for="weight">Вес *</label>
             <input
                 id="weight"
                 v-model.number="form.weight"
                 type="number"
                 min="1"
                 required
-                placeholder="Enter weight"
+                placeholder="Введите вес"
             >
           </div>
         </div>
 
         <div class="form-group">
-          <label for="nationality">Nationality *</label>
+          <label for="nationality">Национальность *</label>
           <select id="nationality" v-model="form.nationality" required>
-            <option value="">Select nationality</option>
+            <option value="">Выберите национальность</option>
             <option v-for="country in countries" :key="country" :value="country">
               {{ country }}
             </option>
@@ -76,7 +76,7 @@
         </div>
 
         <div class="form-group">
-          <label for="birthday">Birthday *</label>
+          <label for="birthday">День рождения *</label>
           <input
               id="birthday"
               v-model="form.birthday"
@@ -86,7 +86,7 @@
         </div>
 
         <fieldset class="coordinates-fieldset">
-          <legend>Coordinates *</legend>
+          <legend>Координаты *</legend>
           <div class="form-row">
             <div class="form-group">
               <label for="coordX">X (> -860)</label>
@@ -97,7 +97,7 @@
                   step="0.1"
                   min="-859"
                   required
-                  placeholder="Enter X coordinate"
+                  placeholder="Введите координату X"
               >
             </div>
 
@@ -110,14 +110,14 @@
                   step="0.1"
                   max="396"
                   required
-                  placeholder="Enter Y coordinate"
+                  placeholder="Введите координату Y"
               >
             </div>
           </div>
         </fieldset>
 
         <fieldset class="location-fieldset">
-          <legend>Location *</legend>
+          <legend>Местоположение *</legend>
           <div class="form-row">
             <div class="form-group">
               <label for="locX">X</label>
@@ -127,7 +127,7 @@
                   type="number"
                   step="0.1"
                   required
-                  placeholder="Enter location X"
+                  placeholder="Введите X местоположения"
               >
             </div>
 
@@ -138,29 +138,29 @@
                   v-model.number="form.location.y"
                   type="number"
                   required
-                  placeholder="Enter location Y"
+                  placeholder="Введите Y местоположения"
               >
             </div>
           </div>
 
           <div class="form-group">
-            <label for="locName">Location Name</label>
+            <label for="locName">Название местоположения</label>
             <input
                 id="locName"
                 v-model="form.location.name"
                 type="text"
                 required
-                placeholder="Enter location name"
+                placeholder="Введите название местоположения"
             >
           </div>
         </fieldset>
 
         <div class="form-actions">
           <button type="button" class="btn btn-secondary" @click="$emit('cancel')">
-            Cancel
+            Отмена
           </button>
           <button type="submit" class="btn btn-primary">
-            {{ editingPerson ? 'Update' : 'Create' }}
+            {{ editingPerson ? 'Обновить' : 'Создать' }}
           </button>
         </div>
       </form>
@@ -206,7 +206,6 @@ export default {
       handler(newPerson) {
         if (newPerson) {
           this.form = { ...newPerson }
-          // Преобразуем дату для datetime-local input
           if (this.form.birthday) {
             this.form.birthday = this.formatDateForInput(this.form.birthday)
           }
@@ -237,12 +236,10 @@ export default {
     },
 
     handleSubmit() {
-      // Валидация
       if (!this.validateForm()) {
         return
       }
 
-      // Преобразуем данные перед отправкой
       const personData = {
         ...this.form,
         birthday: new Date(this.form.birthday).toISOString()
@@ -253,22 +250,22 @@ export default {
 
     validateForm() {
       if (this.form.coordinates.x <= -860) {
-        alert('X coordinate must be greater than -860')
+        alert('Координата X должна быть больше -860')
         return false
       }
 
       if (this.form.coordinates.y > 396) {
-        alert('Y coordinate cannot be greater than 396')
+        alert('Координата Y не может быть больше 396')
         return false
       }
 
       if (this.form.height !== null && this.form.height <= 0) {
-        alert('Height must be greater than 0')
+        alert('Рост должен быть больше 0')
         return false
       }
 
       if (this.form.weight <= 0) {
-        alert('Weight must be greater than 0')
+        alert('Вес должен быть больше 0')
         return false
       }
 

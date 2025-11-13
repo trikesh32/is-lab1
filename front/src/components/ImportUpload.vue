@@ -1,7 +1,7 @@
 <template>
   <div class="import-upload">
     <div class="upload-card">
-      <h2>📤 Import Persons from CSV</h2>
+      <h2>Импорт из CSV</h2>
 
       <div class="file-input-wrapper">
         <input
@@ -12,7 +12,7 @@
           id="file-upload"
         />
         <label for="file-upload" class="file-label">
-          <span v-if="!selectedFile">Choose CSV file</span>
+          <span v-if="!selectedFile">Выберите CSV файл</span>
           <span v-else>{{ selectedFile.name }}</span>
         </label>
       </div>
@@ -22,32 +22,32 @@
         :disabled="!selectedFile || uploading"
         class="btn btn-primary upload-btn"
       >
-        <span v-if="!uploading">Upload & Import</span>
-        <span v-else>Uploading...</span>
+        <span v-if="!uploading">Загрузить и импортировать</span>
+        <span v-else>Загрузка...</span>
       </button>
 
       <div v-if="uploadResult" class="upload-result" :class="uploadResult.type">
         <p>{{ uploadResult.message }}</p>
         <div v-if="uploadResult.details">
-          <p><strong>Import ID:</strong> {{ uploadResult.details.id }}</p>
-          <p><strong>Status:</strong> {{ uploadResult.details.status }}</p>
+          <p><strong>ID импорта:</strong> {{ uploadResult.details.id }}</p>
+          <p><strong>Статус:</strong> {{ uploadResult.details.status }}</p>
           <p v-if="uploadResult.details.objectsCount">
-            <strong>Objects imported:</strong> {{ uploadResult.details.objectsCount }}
+            <strong>Импортировано объектов:</strong> {{ uploadResult.details.objectsCount }}
           </p>
         </div>
       </div>
 
       <div class="csv-format-info">
-        <h3>CSV Format:</h3>
-        <p>The CSV file should have the following columns (in order):</p>
+        <h3>Формат CSV:</h3>
+        <p>CSV файл должен содержать следующие колонки (в указанном порядке):</p>
         <code>name,coord_x,coord_y,eyeColor,hairColor,loc_x,loc_y,loc_name,height,birthday,weight,nationality</code>
         <p class="format-note">
-          <strong>Example:</strong><br>
+          <strong>Пример:</strong><br>
           John Doe,100.5,200.3,BLUE,BLACK,50.0,100,Moscow,180,2000-01-15T10:00:00+03:00,75,RUSSIA
         </p>
         <p class="format-note">
-          <strong>Valid colors:</strong> BLACK, BLUE, YELLOW, ORANGE, WHITE<br>
-          <strong>Valid countries:</strong> RUSSIA, SPAIN, THAILAND
+          <strong>Допустимые цвета:</strong> BLACK, BLUE, YELLOW, ORANGE, WHITE<br>
+          <strong>Допустимые страны:</strong> RUSSIA, SPAIN, THAILAND
         </p>
       </div>
     </div>
@@ -76,7 +76,7 @@ export default {
       if (!this.selectedFile) {
         this.uploadResult = {
           type: 'error',
-          message: 'Please select a file'
+          message: 'Пожалуйста, выберите файл'
         }
         return
       }
@@ -87,7 +87,6 @@ export default {
       const formData = new FormData()
       formData.append('file', this.selectedFile)
 
-      // Получаем токен из localStorage
       const token = localStorage.getItem('token')
 
       try {
@@ -100,21 +99,19 @@ export default {
 
         this.uploadResult = {
           type: 'success',
-          message: 'File uploaded and imported successfully!',
+          message: 'Файл успешно загружен и импортирован!',
           details: response.data
         }
 
-        // Очищаем форму
         this.selectedFile = null
         this.$refs.fileInput.value = ''
 
-        // Уведомляем родительский компонент
         this.$emit('import-completed', response.data)
 
       } catch (error) {
         this.uploadResult = {
           type: 'error',
-          message: error.response?.data?.error || error.message || 'Upload failed'
+          message: error.response?.data?.error || error.message || 'Ошибка загрузки'
         }
       } finally {
         this.uploading = false

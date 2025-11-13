@@ -10,10 +10,10 @@
     <!-- Если авторизован - показываем приложение -->
     <template v-else>
       <header class="app-header">
-        <h1>Трикашный Михаил Дмитриевич P3306 228</h1>
+        <h1>Трикашный Михаил Дмитриевич P3306 345</h1>
         <div class="user-info">
-          <span class="user-badge">👤 {{ currentUser.username }} <span class="role-tag">{{ currentUser.role }}</span></span>
-          <button @click="handleLogout" class="btn btn-logout">Logout</button>
+          <span class="user-badge">{{ currentUser.username }} <span class="role-tag">{{ currentUser.role }}</span></span>
+          <button @click="handleLogout" class="btn btn-logout">Выйти</button>
         </div>
       </header>
 

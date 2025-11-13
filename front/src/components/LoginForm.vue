@@ -3,28 +3,28 @@
     <div class="auth-modal">
       <button class="close-btn" @click="$emit('close')">×</button>
       
-      <h2>{{ isLogin ? 'Login' : 'Register' }}</h2>
+      <h2>{{ isLogin ? 'Вход' : 'Регистрация' }}</h2>
       
       <form @submit.prevent="handleSubmit">
         <div class="form-group">
-          <label for="username">Username:</label>
+          <label for="username">Имя пользователя:</label>
           <input
             type="text"
             id="username"
             v-model="username"
             required
-            placeholder="Enter username"
+            placeholder="Введите имя пользователя"
           />
         </div>
 
         <div class="form-group">
-          <label for="password">Password:</label>
+          <label for="password">Пароль:</label>
           <input
             type="password"
             id="password"
             v-model="password"
             required
-            placeholder="Enter password"
+            placeholder="Введите пароль"
           />
         </div>
 
@@ -33,18 +33,18 @@
         </div>
 
         <button type="submit" class="btn btn-primary" :disabled="loading">
-          {{ loading ? 'Processing...' : (isLogin ? 'Login' : 'Register') }}
+          {{ loading ? 'Обработка...' : (isLogin ? 'Войти' : 'Зарегистрироваться') }}
         </button>
       </form>
 
       <div class="auth-switch">
         <span v-if="isLogin">
-          Don't have an account?
-          <a href="#" @click.prevent="isLogin = false">Register</a>
+          Нет аккаунта?
+          <a href="#" @click.prevent="isLogin = false">Зарегистрироваться</a>
         </span>
         <span v-else>
-          Already have an account?
-          <a href="#" @click.prevent="isLogin = true">Login</a>
+          Уже есть аккаунт?
+          <a href="#" @click.prevent="isLogin = true">Войти</a>
         </span>
       </div>
     </div>

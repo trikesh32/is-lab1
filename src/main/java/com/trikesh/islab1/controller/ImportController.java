@@ -45,7 +45,6 @@ public class ImportController {
                 return ResponseEntity.badRequest().body(Map.of("error", "Only CSV files are allowed"));
             }
 
-            // Получаем текущего пользователя из JWT токена
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             String username = authentication.getName();
             
@@ -76,19 +75,16 @@ public class ImportController {
 
         Pageable pageable = PageRequest.of(page, size);
 
-        // Получаем текущего пользователя из JWT токена
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
         
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // Если пользователь - админ, показываем всё
         if (user.getRole() == UserRole.ADMIN) {
             Page<ImportHistory> history = importHistoryRepository.findAllByOrderByCreatedAtDesc(pageable);
             return ResponseEntity.ok(history);
         } else {
-            // Обычный пользователь видит только свои операции
             Page<ImportHistory> history = importHistoryRepository.findByUserOrderByCreatedAtDesc(user, pageable);
             return ResponseEntity.ok(history);
         }

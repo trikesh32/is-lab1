@@ -1,14 +1,14 @@
 <template>
   <div class="user-management">
     <div class="management-card">
-      <h2>👥 User Management</h2>
+      <h2>Управление пользователями</h2>
       
       <div v-if="loading" class="loading">
-        Loading users...
+        Загрузка пользователей...
       </div>
 
       <div v-else-if="users.length === 0" class="no-data">
-        No users found
+        Пользователи не найдены
       </div>
 
       <div v-else class="users-table-wrapper">
@@ -16,9 +16,9 @@
           <thead>
             <tr>
               <th>ID</th>
-              <th>Username</th>
-              <th>Role</th>
-              <th>Actions</th>
+              <th>Имя пользователя</th>
+              <th>Роль</th>
+              <th>Действия</th>
             </tr>
           </thead>
           <tbody>
@@ -35,25 +35,25 @@
                   v-if="user.role === 'USER'"
                   @click="promoteUser(user)"
                   class="btn btn-sm btn-success"
-                  title="Promote to Admin"
+                  title="Сделать администратором"
                 >
-                  ⬆️ Promote
+                  Повысить
                 </button>
                 <button
                   v-if="user.role === 'ADMIN' && user.username !== currentUser.username"
                   @click="demoteUser(user)"
                   class="btn btn-sm btn-warning"
-                  title="Demote to User"
+                  title="Убрать права администратора"
                 >
-                  ⬇️ Demote
+                  Понизить
                 </button>
                 <button
                   v-if="user.username !== currentUser.username"
                   @click="deleteUser(user)"
                   class="btn btn-sm btn-danger"
-                  title="Delete User"
+                  title="Удалить пользователя"
                 >
-                  🗑️ Delete
+                  Удалить
                 </button>
               </td>
             </tr>
@@ -93,37 +93,37 @@ export default {
     },
 
     async promoteUser(user) {
-      if (confirm(`Promote ${user.username} to Admin?`)) {
+      if (confirm(`Сделать ${user.username} администратором?`)) {
         try {
           await AuthService.promoteToAdmin(user.id)
-          this.$emit('success', `${user.username} promoted to Admin`)
+          this.$emit('success', `${user.username} повышен до администратора`)
           this.loadUsers()
         } catch (error) {
-          this.$emit('error', 'Failed to promote user')
+          this.$emit('error', 'Не удалось повысить пользователя')
         }
       }
     },
 
     async demoteUser(user) {
-      if (confirm(`Demote ${user.username} to regular User?`)) {
+      if (confirm(`Убрать права администратора у ${user.username}?`)) {
         try {
           await AuthService.demoteToUser(user.id)
-          this.$emit('success', `${user.username} demoted to User`)
+          this.$emit('success', `${user.username} понижен до обычного пользователя`)
           this.loadUsers()
         } catch (error) {
-          this.$emit('error', 'Failed to demote user')
+          this.$emit('error', 'Не удалось понизить пользователя')
         }
       }
     },
 
     async deleteUser(user) {
-      if (confirm(`Are you sure you want to delete user ${user.username}? This action cannot be undone.`)) {
+      if (confirm(`Вы уверены, что хотите удалить пользователя ${user.username}? Это действие нельзя отменить.`)) {
         try {
           await AuthService.deleteUser(user.id)
-          this.$emit('success', `User ${user.username} deleted`)
+          this.$emit('success', `Пользователь ${user.username} удален`)
           this.loadUsers()
         } catch (error) {
-          this.$emit('error', 'Failed to delete user')
+          this.$emit('error', 'Не удалось удалить пользователя')
         }
       }
     }

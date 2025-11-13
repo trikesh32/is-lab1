@@ -14,13 +14,10 @@ import java.util.List;
 
 @Repository
 public interface PersonRepository extends JpaRepository<Person, Long> {
-    // Фильтрация по имени (неполное совпадение)
     Page<Person> findByNameContainingIgnoreCase(String name, Pageable pageable);
 
-    // Сортировка и фильтрация
     Page<Person> findAllByOrderByNameAsc(Pageable pageable);
 
-    // Специальные операции
     @Query("SELECT SUM(p.height) FROM Person p WHERE p.height IS NOT NULL")
     Long sumHeight();
 
