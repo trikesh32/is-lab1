@@ -1,42 +1,69 @@
 <template>
   <div id="app">
-    <header class="app-header">
-      <h1>Трикашный Михаил Дмитриевич P3306 228</h1>
-    </header>
-
-    <main class="app-main">
-      <PersonTable
-          :persons="persons"
-          :pagination="pagination"
-          @page-change="handlePageChange"
-          @edit-person="handleEditPerson"
-          @delete-person="handleDeletePerson"
-          @refresh="loadPersons"
-          @add-person="handleAddPerson"
-      />
-
-      <PersonOperations
-          @calculate-total-height="calculateTotalHeight"
-          @count-by-weight="countByWeight"
-          @find-by-birthday="findByBirthday"
-          @hair-color-percentage="getHairColorPercentage"
-          @eye-color-percentage="getEyeColorPercentage"
-      />
-
-      <PersonForm
-          v-if="showForm"
-          :person="editingPerson"
-          @save="handleSavePerson"
-          @cancel="handleCancelEdit"
-      />
-    </main>
-
-    <Notification
-        v-if="notification.show"
-        :message="notification.message"
-        :type="notification.type"
-        @close="notification.show = false"
+    <!-- Если не авторизован - показываем форму логина -->
+    <LoginForm 
+      v-if="!isAuthenticated" 
+      @success="handleLoginSuccess"
+      @close="handleLoginSuccess"
     />
+
+    <!-- Если авторизован - показываем приложение -->
+    <template v-else>
+      <header class="app-header">
+        <h1>Трикашный Михаил Дмитриевич P3306 228</h1>
+        <div class="user-info">
+          <span class="user-badge">👤 {{ currentUser.username }} <span class="role-tag">{{ currentUser.role }}</span></span>
+          <button @click="handleLogout" class="btn btn-logout">Logout</button>
+        </div>
+      </header>
+
+      <main class="app-main">
+        <!-- Управление пользователями (только для админа) -->
+        <UserManagement 
+          v-if="isAdmin" 
+          @success="showNotification($event, 'success')"
+          @error="showNotification($event, 'error')"
+        />
+
+        <PersonTable
+            :persons="persons"
+            :pagination="pagination"
+            @page-change="handlePageChange"
+            @edit-person="handleEditPerson"
+            @delete-person="handleDeletePerson"
+            @refresh="loadPersons"
+            @add-person="handleAddPerson"
+        />
+
+        <PersonOperations
+            @calculate-total-height="calculateTotalHeight"
+            @count-by-weight="countByWeight"
+            @find-by-birthday="findByBirthday"
+            @hair-color-percentage="getHairColorPercentage"
+            @eye-color-percentage="getEyeColorPercentage"
+        />
+
+        <ImportUpload
+            @import-completed="handleImportCompleted"
+        />
+
+        <ImportHistory ref="importHistory" />
+
+        <PersonForm
+            v-if="showForm"
+            :person="editingPerson"
+            @save="handleSavePerson"
+            @cancel="handleCancelEdit"
+        />
+      </main>
+
+      <Notification
+          v-if="notification.show"
+          :message="notification.message"
+          :type="notification.type"
+          @close="notification.show = false"
+      />
+    </template>
   </div>
 </template>
 
@@ -45,8 +72,13 @@ import PersonTable from './components/PersonTable.vue'
 import PersonForm from './components/PersonForm.vue'
 import PersonOperations from './components/PersonOperations.vue'
 import Notification from './components/Notification.vue'
+import ImportUpload from './components/ImportUpload.vue'
+import ImportHistory from './components/ImportHistory.vue'
+import LoginForm from './components/LoginForm.vue'
+import UserManagement from './components/UserManagement.vue'
 import PersonService from './services/PersonService'
 import WebSocketService from './services/WebSocketService'
+import AuthService from './services/AuthService'
 
 export default {
   name: 'App',
@@ -54,10 +86,16 @@ export default {
     PersonTable,
     PersonForm,
     PersonOperations,
-    Notification
+    Notification,
+    ImportUpload,
+    ImportHistory,
+    LoginForm,
+    UserManagement
   },
   data() {
     return {
+      isAuthenticated: false,
+      currentUser: null,
       persons: [],
       pagination: {
         page: 0,
@@ -74,14 +112,43 @@ export default {
       }
     }
   },
-  async mounted() {
-    await this.loadPersons()
-    this.connectWebSocket()
+  computed: {
+    isAdmin() {
+      return this.currentUser && this.currentUser.role === 'ADMIN'
+    }
+  },
+  mounted() {
+    this.checkAuth()
   },
   beforeUnmount() {
     WebSocketService.disconnect()
   },
   methods: {
+    checkAuth() {
+      this.isAuthenticated = AuthService.isAuthenticated()
+      if (this.isAuthenticated) {
+        this.currentUser = AuthService.getUser()
+        this.loadPersons()
+        this.connectWebSocket()
+      }
+    },
+
+    handleLoginSuccess() {
+      this.checkAuth()
+      this.showNotification('Successfully logged in!', 'success')
+    },
+
+    handleLogout() {
+      if (confirm('Are you sure you want to logout?')) {
+        AuthService.logout()
+        this.isAuthenticated = false
+        this.currentUser = null
+        this.persons = []
+        WebSocketService.disconnect()
+        this.showNotification('Logged out successfully', 'info')
+      }
+    },
+
     handleAddPerson(){
       this.editingPerson = null;
       this.showForm = true;
@@ -98,7 +165,12 @@ export default {
           totalPages: response.totalPages
         }
       } catch (error) {
-        this.showNotification('Error loading persons: ' + error.message, 'error')
+        if (error.response?.status === 401) {
+          this.showNotification('Session expired. Please login again.', 'error')
+          this.handleLogout()
+        } else {
+          this.showNotification('Error loading persons: ' + error.message, 'error')
+        }
       }
     },
 
@@ -253,6 +325,15 @@ export default {
       }
     },
 
+    handleImportCompleted(data) {
+      this.showNotification(`Import completed! ${data.objectsCount} objects imported`, 'success')
+      this.loadPersons(0)
+      // Обновляем историю импорта
+      if (this.$refs.importHistory) {
+        this.$refs.importHistory.loadHistory()
+      }
+    },
+
     showNotification(message, type = 'info') {
       this.notification = {
         show: true,
@@ -287,11 +368,51 @@ body {
   color: white;
   padding: 1rem 2rem;
   box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .app-header h1 {
   font-size: 1.8rem;
   font-weight: 300;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.user-badge {
+  background-color: rgba(255, 255, 255, 0.2);
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+}
+
+.role-tag {
+  background-color: rgba(255, 255, 255, 0.3);
+  padding: 0.2rem 0.6rem;
+  border-radius: 10px;
+  font-size: 0.8rem;
+  margin-left: 0.5rem;
+  font-weight: 600;
+}
+
+.btn-logout {
+  background-color: rgba(220, 53, 69, 0.9);
+  color: white;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.btn-logout:hover {
+  background-color: #c82333;
 }
 
 .app-main {

@@ -10,6 +10,20 @@ class PersonService {
                 'Content-Type': 'application/json'
             }
         })
+
+        // Добавляем интерцептор для автоматического добавления токена
+        this.api.interceptors.request.use(
+            (config) => {
+                const token = localStorage.getItem('token')
+                if (token) {
+                    config.headers.Authorization = `Bearer ${token}`
+                }
+                return config
+            },
+            (error) => {
+                return Promise.reject(error)
+            }
+        )
     }
 
     async getAllPersons(page = 0, size = 10) {

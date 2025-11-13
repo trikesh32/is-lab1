@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZonedDateTime;
@@ -15,7 +16,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-@Transactional
+@Transactional(isolation = Isolation.READ_COMMITTED)
 public class PersonService {
 
     @Autowired
@@ -36,8 +37,15 @@ public class PersonService {
         return personRepository.findById(id);
     }
 
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     public Person save(Person person) {
         boolean isNew = person.getId() == null;
+        
+        // Проверка уникальности: имя + координаты + дата рождения
+        if (isNew) {
+            validateUniqueConstraints(person);
+        }
+        
         Person savedPerson = personRepository.save(person);
         if (isNew) {
             webSocketController.notifyPersonCreated(savedPerson);
@@ -46,8 +54,26 @@ public class PersonService {
         }
         return savedPerson;
     }
+    
+    private void validateUniqueConstraints(Person person) {
+        List<Person> existingPersons = personRepository.findByNameContainingIgnoreCase(person.getName(), null).getContent();
+        for (Person existing : existingPersons) {
+            if (existing.getName().equals(person.getName()) &&
+                existing.getCoordinates().getX() == person.getCoordinates().getX() &&
+                existing.getCoordinates().getY().equals(person.getCoordinates().getY()) &&
+                existing.getBirthday().equals(person.getBirthday())) {
+                throw new IllegalArgumentException(
+                    "Person with same name, coordinates and birthday already exists"
+                );
+            }
+        }
+    }
 
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     public void deleteById(Long id) {
+        if (!personRepository.existsById(id)) {
+            throw new IllegalArgumentException("Person with id " + id + " not found");
+        }
         personRepository.deleteById(id);
         webSocketController.notifyPersonDeleted(id);
     }
