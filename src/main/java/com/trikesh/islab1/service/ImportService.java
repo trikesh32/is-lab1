@@ -140,8 +140,8 @@ public class ImportService {
     private Person parseCsvLine(String line) {
         String[] fields = line.split(",");
         
-        if (fields.length < 13) {
-            throw new IllegalArgumentException("Invalid CSV format: expected 13 fields, got " + fields.length);
+        if (fields.length < 12) {
+            throw new IllegalArgumentException("Invalid CSV format: expected 12 fields, got " + fields.length);
         }
 
         Person person = new Person();

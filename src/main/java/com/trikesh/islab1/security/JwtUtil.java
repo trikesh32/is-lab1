@@ -41,11 +41,11 @@ public class JwtUtil {
     }
 
     private Claims extractAllClaims(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(getSigningKey())
+        return Jwts.parser()
+                .verifyWith(getSigningKey())
                 .build()
-                .parseClaimsJws(token)
-                .getBody();
+                .parseSignedClaims(token)
+                .getPayload();
     }
 
     private Boolean isTokenExpired(String token) {
@@ -80,7 +80,7 @@ public class JwtUtil {
 
     public Boolean validateToken(String token) {
         try {
-            Jwts.parserBuilder()
+            Jwts.parser()
                     .setSigningKey(getSigningKey())
                     .build()
                     .parseClaimsJws(token);
