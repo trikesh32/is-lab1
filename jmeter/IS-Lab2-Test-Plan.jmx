@@ -41,19 +41,19 @@
                 <stringProp name="Argument.value">{&#xd;
   &quot;name&quot;: &quot;Test User ${__threadNum}&quot;,&#xd;
   &quot;coordinates&quot;: {&#xd;
-    &quot;x&quot;: 100.0,&#xd;
-    &quot;y&quot;: 200.0&#xd;
+    &quot;x&quot;: ${__Random(1,500)},&#xd;
+    &quot;y&quot;: ${__Random(1,300)}&#xd;
   },&#xd;
   &quot;eyeColor&quot;: &quot;BLUE&quot;,&#xd;
   &quot;hairColor&quot;: &quot;BLACK&quot;,&#xd;
   &quot;location&quot;: {&#xd;
-    &quot;x&quot;: 50.0,&#xd;
-    &quot;y&quot;: 100,&#xd;
-    &quot;name&quot;: &quot;Test Location&quot;&#xd;
+    &quot;x&quot;: ${__Random(1,100)}.0,&#xd;
+    &quot;y&quot;: ${__Random(1,200)},&#xd;
+    &quot;name&quot;: &quot;Location ${__threadNum}&quot;&#xd;
   },&#xd;
-  &quot;height&quot;: 180,&#xd;
-  &quot;birthday&quot;: &quot;2000-01-01T10:00:00+03:00&quot;,&#xd;
-  &quot;weight&quot;: 75,&#xd;
+  &quot;height&quot;: ${__Random(160,200)},&#xd;
+  &quot;birthday&quot;: &quot;200${__threadNum}-01-01T10:00:00+03:00&quot;,&#xd;
+  &quot;weight&quot;: ${__Random(60,90)},&#xd;
   &quot;nationality&quot;: &quot;RUSSIA&quot;&#xd;
 }</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
