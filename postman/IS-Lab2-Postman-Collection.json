@@ -1,0 +1,425 @@
+{
+	"info": {
+		"_postman_id": "is-lab2-concurrent-tests",
+		"name": "IS Lab2 - Concurrent Operations Tests",
+		"description": "Тестирование параллельных операций и уровней изоляции транзакций",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080",
+			"type": "string"
+		},
+		{
+			"key": "personId",
+			"value": "1",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "1. Concurrent Create Operations",
+			"item": [
+				{
+					"name": "Create Person 1",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Test User 1\",\n  \"coordinates\": {\n    \"x\": {{$randomInt}},\n    \"y\": {{$randomInt}}\n  },\n  \"eyeColor\": \"BLUE\",\n  \"hairColor\": \"BLACK\",\n  \"location\": {\n    \"x\": {{$randomInt}}.0,\n    \"y\": {{$randomInt}},\n    \"name\": \"Location 1\"\n  },\n  \"height\": 180,\n  \"birthday\": \"2001-01-01T10:00:00+03:00\",\n  \"weight\": 75,\n  \"nationality\": \"RUSSIA\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/persons",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "persons"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Person 2",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Test User 2\",\n  \"coordinates\": {\n    \"x\": {{$randomInt}},\n    \"y\": {{$randomInt}}\n  },\n  \"eyeColor\": \"BLUE\",\n  \"hairColor\": \"BLACK\",\n  \"location\": {\n    \"x\": {{$randomInt}}.0,\n    \"y\": {{$randomInt}},\n    \"name\": \"Location 2\"\n  },\n  \"height\": 175,\n  \"birthday\": \"2002-01-01T10:00:00+03:00\",\n  \"weight\": 70,\n  \"nationality\": \"RUSSIA\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/persons",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "persons"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Person 3",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Test User 3\",\n  \"coordinates\": {\n    \"x\": {{$randomInt}},\n    \"y\": {{$randomInt}}\n  },\n  \"eyeColor\": \"YELLOW\",\n  \"hairColor\": \"ORANGE\",\n  \"location\": {\n    \"x\": {{$randomInt}}.0,\n    \"y\": {{$randomInt}},\n    \"name\": \"Location 3\"\n  },\n  \"height\": 185,\n  \"birthday\": \"2003-01-01T10:00:00+03:00\",\n  \"weight\": 80,\n  \"nationality\": \"SPAIN\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/persons",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "persons"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Person 4",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Test User 4\",\n  \"coordinates\": {\n    \"x\": {{$randomInt}},\n    \"y\": {{$randomInt}}\n  },\n  \"eyeColor\": \"BLACK\",\n  \"hairColor\": \"WHITE\",\n  \"location\": {\n    \"x\": {{$randomInt}}.0,\n    \"y\": {{$randomInt}},\n    \"name\": \"Location 4\"\n  },\n  \"height\": 170,\n  \"birthday\": \"2004-01-01T10:00:00+03:00\",\n  \"weight\": 65,\n  \"nationality\": \"THAILAND\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/persons",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "persons"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Person 5",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Test User 5\",\n  \"coordinates\": {\n    \"x\": {{$randomInt}},\n    \"y\": {{$randomInt}}\n  },\n  \"eyeColor\": \"ORANGE\",\n  \"hairColor\": \"YELLOW\",\n  \"location\": {\n    \"x\": {{$randomInt}}.0,\n    \"y\": {{$randomInt}},\n    \"name\": \"Location 5\"\n  },\n  \"height\": 190,\n  \"birthday\": \"2005-01-01T10:00:00+03:00\",\n  \"weight\": 85,\n  \"nationality\": \"RUSSIA\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/persons",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "persons"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "2. Concurrent Update Operations",
+			"item": [
+				{
+					"name": "Update Person (Thread 1)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Updated by Thread 1\",\n  \"coordinates\": {\n    \"x\": {{$randomInt}},\n    \"y\": {{$randomInt}}\n  },\n  \"eyeColor\": \"YELLOW\",\n  \"hairColor\": \"ORANGE\",\n  \"location\": {\n    \"x\": 60.0,\n    \"y\": 120,\n    \"name\": \"Updated Location 1\"\n  },\n  \"height\": 175,\n  \"birthday\": \"1995-05-15T12:00:00+03:00\",\n  \"weight\": 70,\n  \"nationality\": \"SPAIN\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/persons/{{personId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "persons", "{{personId}}"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Person (Thread 2)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Updated by Thread 2\",\n  \"coordinates\": {\n    \"x\": {{$randomInt}},\n    \"y\": {{$randomInt}}\n  },\n  \"eyeColor\": \"BLACK\",\n  \"hairColor\": \"WHITE\",\n  \"location\": {\n    \"x\": 65.0,\n    \"y\": 125,\n    \"name\": \"Updated Location 2\"\n  },\n  \"height\": 180,\n  \"birthday\": \"1996-06-16T13:00:00+03:00\",\n  \"weight\": 72,\n  \"nationality\": \"THAILAND\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/persons/{{personId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "persons", "{{personId}}"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Person (Thread 3)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Updated by Thread 3\",\n  \"coordinates\": {\n    \"x\": {{$randomInt}},\n    \"y\": {{$randomInt}}\n  },\n  \"eyeColor\": \"BLUE\",\n  \"hairColor\": \"BLACK\",\n  \"location\": {\n    \"x\": 70.0,\n    \"y\": 130,\n    \"name\": \"Updated Location 3\"\n  },\n  \"height\": 185,\n  \"birthday\": \"1997-07-17T14:00:00+03:00\",\n  \"weight\": 75,\n  \"nationality\": \"RUSSIA\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/persons/{{personId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "persons", "{{personId}}"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "3. Concurrent Delete Operations",
+			"item": [
+				{
+					"name": "Delete Person (Thread 1)",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/persons/2",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "persons", "2"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Person (Thread 2)",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/persons/2",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "persons", "2"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "4. Read Operations",
+			"item": [
+				{
+					"name": "Get All Persons",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/persons?page=0&size=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "persons"],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Person by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/persons/{{personId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "persons", "{{personId}}"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "5. Special Operations",
+			"item": [
+				{
+					"name": "Calculate Total Height",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/persons/operations/total-height",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "persons", "operations", "total-height"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Count by Weight Less Than",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/persons/operations/count-by-weight-less-than?weight=75",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "persons", "operations", "count-by-weight-less-than"],
+							"query": [
+								{
+									"key": "weight",
+									"value": "75"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Find by Birthday Before",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/persons/operations/birthday-before?dateTime=2000-01-01T00:00:00+03:00",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "persons", "operations", "birthday-before"],
+							"query": [
+								{
+									"key": "dateTime",
+									"value": "2000-01-01T00:00:00+03:00"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Hair Color Percentage",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/persons/operations/hair-color-percentage?hairColor=BLACK",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "persons", "operations", "hair-color-percentage"],
+							"query": [
+								{
+									"key": "hairColor",
+									"value": "BLACK"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Eye Color Percentage",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/persons/operations/eye-color-percentage?eyeColor=BLUE",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "persons", "operations", "eye-color-percentage"],
+							"query": [
+								{
+									"key": "eyeColor",
+									"value": "BLUE"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "6. Import Operations",
+			"item": [
+				{
+					"name": "Upload CSV File",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "/test-data/sample-import.csv"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/import/upload",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "import", "upload"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Import History",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/import/history?page=0&size=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "import", "history"],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
