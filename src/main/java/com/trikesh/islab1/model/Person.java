@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
@@ -12,6 +14,8 @@ import java.time.ZonedDateTime;
 @Setter
 @Entity
 @Table(name = "persons")
+@Cacheable
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @AttributeOverrides({
         @AttributeOverride(name = "coordinates.x", column = @Column(name = "coord_x")),
         @AttributeOverride(name = "coordinates.y", column = @Column(name = "coord_y")),

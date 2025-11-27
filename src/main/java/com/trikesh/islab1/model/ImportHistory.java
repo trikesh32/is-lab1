@@ -3,6 +3,8 @@ package com.trikesh.islab1.model;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import java.time.LocalDateTime;
 
@@ -10,6 +12,8 @@ import java.time.LocalDateTime;
 @Setter
 @Entity
 @Table(name = "import_history")
+@Cacheable
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class ImportHistory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,6 +41,9 @@ public class ImportHistory {
 
     @Column(name = "file_name")
     private String fileName;
+
+    @Column(name = "file_path")
+    private String filePath;
 
     @PrePersist
     protected void onCreate() {

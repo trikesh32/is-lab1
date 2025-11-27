@@ -1,19 +1,14 @@
 package com.trikesh.islab1.service;
 
-import com.trikesh.islab1.controller.PersonWebSocketController;
 import com.trikesh.islab1.model.*;
-import com.trikesh.islab1.repository.ImportHistoryRepository;
 import com.trikesh.islab1.repository.PersonRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -29,10 +24,7 @@ public class ImportService {
     private PersonRepository personRepository;
 
     @Autowired
-    private ImportHistoryRepository importHistoryRepository;
-
-    @Autowired
-    private PersonWebSocketController webSocketController;
+    private TwoPhaseCommitService twoPhaseCommitService;
 
     private void validateUniqueConstraints(Person person, Set<String> importedKeys) {
         validateNameCoordinatesBirthday(person, importedKeys);
@@ -139,11 +131,7 @@ public class ImportService {
                person.getBirthday().toString();
     }
 
-    @Transactional(isolation = Isolation.SERIALIZABLE, rollbackFor = Exception.class)
     public ImportHistory importPersonsFromCsv(MultipartFile file, User user) {
-        ImportHistory history = new ImportHistory(user, file.getOriginalFilename());
-        history = importHistoryRepository.save(history);
-
         try {
             List<Person> persons = parseCsvFile(file);
             
@@ -151,26 +139,10 @@ public class ImportService {
                 throw new IllegalArgumentException("No valid persons found in file");
             }
 
-            List<Person> savedPersons = personRepository.saveAll(persons);
-
-            history.setStatus(ImportStatus.SUCCESS);
-            history.setObjectsCount(savedPersons.size());
-            history.setCompletedAt(LocalDateTime.now());
-            importHistoryRepository.save(history);
-
-            for (Person person : savedPersons) {
-                webSocketController.notifyPersonCreated(person);
-            }
-
-            log.info("Successfully imported {} persons from file {}", savedPersons.size(), file.getOriginalFilename());
-            return history;
+            return twoPhaseCommitService.executeImport(file, user, persons);
 
         } catch (Exception e) {
             log.error("Error importing persons from file {}: {}", file.getOriginalFilename(), e.getMessage());
-            history.setStatus(ImportStatus.FAILED);
-            history.setErrorMessage(e.getMessage());
-            history.setCompletedAt(LocalDateTime.now());
-            importHistoryRepository.save(history);
             throw new RuntimeException("Import failed: " + e.getMessage(), e);
         }
     }

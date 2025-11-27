@@ -23,6 +23,7 @@
               <th>Создано</th>
               <th>Завершено</th>
               <th>Ошибка</th>
+              <th>Действия</th>
             </tr>
           </thead>
           <tbody>
@@ -43,6 +44,17 @@
                   {{ truncateError(item.errorMessage) }}
                 </span>
                 <span v-else>-</span>
+              </td>
+              <td>
+                <button
+                  v-if="item.filePath"
+                  @click="downloadFile(item.id, item.fileName)"
+                  class="btn btn-download"
+                  title="Скачать файл"
+                >
+                  📥 Скачать
+                </button>
+                <span v-else class="no-file">-</span>
               </td>
             </tr>
           </tbody>
@@ -142,6 +154,35 @@ export default {
     truncateError(error) {
       if (!error) return '-'
       return error.length > 50 ? error.substring(0, 50) + '...' : error
+    },
+
+    async downloadFile(id, fileName) {
+      try {
+        const token = localStorage.getItem('token')
+        const response = await axios.get(
+          `http://localhost:8080/api/import/download/${id}`,
+          {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            },
+            responseType: 'blob'
+          }
+        )
+
+        const url = window.URL.createObjectURL(new Blob([response.data]))
+        const link = document.createElement('a')
+        link.href = url
+        link.setAttribute('download', fileName)
+        document.body.appendChild(link)
+        link.click()
+        link.remove()
+        window.URL.revokeObjectURL(url)
+
+        this.$emit('success', 'Файл успешно скачан')
+      } catch (error) {
+        console.error('Error downloading file:', error)
+        this.$emit('error', 'Не удалось скачать файл')
+      }
     }
   }
 }
@@ -255,5 +296,25 @@ export default {
 .pagination button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.btn-download {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 0.4rem 0.8rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: background-color 0.2s;
+}
+
+.btn-download:hover {
+  background-color: #0056b3;
+}
+
+.no-file {
+  color: #999;
+  font-style: italic;
 }
 </style>
