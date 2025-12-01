@@ -12,7 +12,7 @@ public class Location {
     @NotNull(message = "X cannot be null")
     private Float x;
 
-    private int y;
+    private Integer y;
 
     @NotBlank(message = "Name cannot be empty")
     private String name;
